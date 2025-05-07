@@ -71,7 +71,6 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
-        DEPLOYMENT_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
       working-directory: "./2-Terraform/aks"
       continue-on-error: false
 
@@ -84,6 +83,5 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
-        DEPLOYMENT_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
       working-directory: "./2-Terraform/aks"
       continue-on-error: false
