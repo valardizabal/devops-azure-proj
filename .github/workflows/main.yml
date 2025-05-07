@@ -13,7 +13,6 @@ on:
 
 jobs:
   terraform-fmt-check:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
     defaults:
       run:
         working-directory: "./2-Terraform/aks"
@@ -25,7 +24,7 @@ jobs:
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
       tf_resource_group_name: "devops-proj-rg"
       tf_storage_account_name: "devopsprojst"
@@ -44,11 +43,11 @@ jobs:
 
     - name: Terraform Init
       id: init
-      run: terraform init
+      run: terraform init -reconfigure
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
       working-directory: "./2-Terraform/aks"
 
@@ -66,25 +65,23 @@ jobs:
 
     - name: Terraform Plan  
       id: plan
-      run: terraform plan -no-color -input=false -var deployment_subscription_id=$DEPLOYMENT_SUBSCRIPTION_ID
+      run: terraform plan -no-color -input=false 
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
-        DEPLOYMENT_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       working-directory: "./2-Terraform/aks"
       continue-on-error: false
 
     - name: Terraform Apply  
       id: apply
-      run: terraform apply -auto-approve -input=false -var deployment_subscription_id=$DEPLOYMENT_SUBSCRIPTION_ID
+      run: terraform apply -auto-approve -input=false
       # if: github.ref == 'refs/heads/main'
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_AD_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
-        DEPLOYMENT_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       working-directory: "./2-Terraform/aks"
       continue-on-error: false
