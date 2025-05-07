@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+# on:
+#   workflow_dispatch:
+
+jobs:
+  terraform-fmt-check:
+    if: github.event_name == 'pull_request'
+    defaults:
+      run:
+        working-directory: "./2-Terraform/aks"
+    name: Terraform
+    environment: production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+      tf_resource_group_name: "thomasthorntoncloud"
+      tf_storage_account_name: "thomasthorntontfstate"
+      tf_state_container: "devopsthehardwaygithub"
+      tf_state_key: "terraform.tfstate"
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2.5.0
+ 
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.9.6
+        terraform_wrapper: true
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+      working-directory: "./Terraform-AZURE-Services-Creation/AKS"
+
+    - name: Terraform Fmt
+      id: fmt
+      run: terraform fmt
+      working-directory: "./2-Terraform/aks"
+
+    - name: Auto Commit Changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "Terraform fmt"
+        file_pattern: "*.tf *.tfvars"
+        commit_user_name: "github-actions[bot]"
+
+    - name: Terraform Plan  
+      id: plan
+      run: terraform plan -no-color -input=false -var deployment_subscription_id=$DEPLOYMENT_SUBSCRIPTION_ID
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+        DEPLOYMENT_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      working-directory: "./2-Terraform/aks"
+      continue-on-error: false
+
+    - name: Terraform Apply  
+      id: apply
+      run: terraform apply -auto-approve -input=false -var deployment_subscription_id=$DEPLOYMENT_SUBSCRIPTION_ID
+      # if: github.ref == 'refs/heads/main'
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+        DEPLOYMENT_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      working-directory: "./2-Terraform/aks"
+      continue-on-error: false
