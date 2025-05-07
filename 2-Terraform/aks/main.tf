@@ -146,7 +146,6 @@ resource "azurerm_role_assignment" "acr_pull" {
 }
 
 #fixing for  "The client '62119122-6287-4620-98b4-bf86535e2ece' with object id '62119122-6287-4620-98b4-bf86535e2ece' does not have authorization to perform action 'Microsoft.ServiceNetworking/register/action' over scope '/subscriptions/XXXXX' or the scope is invalid. (As part of App Gw for containers - maanged by ALB controller setup)"
-
 # Delegate AppGw for Containers Configuration Manager role to RG containing Application Gateway for Containers resource
 resource "azurerm_role_assignment" "appgwcontainerfix2" {
   principal_id         = azurerm_user_assigned_identity.alb_identity.principal_id
