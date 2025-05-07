@@ -5,8 +5,8 @@
 Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
 Import-Module Az
 
-$tenantId = ""
-$subscriptionId = ""
+$tenantId = "e1858381-60c4-4a56-9e29-7d9efe1ddc47"
+$subscriptionId = "8c6f346b-200d-4475-99b4-d26874174cbd"
 $rgGroupName = "devops-proj-rg"
 $storageAccountName = "devopsprojst"
 $containerName = "tfstate"
@@ -15,25 +15,26 @@ $containerName = "tfstate"
 Connect-AzAccount -Tenant $tenantId -Subscription $subscriptionId
 
 # Check if rg exists
-if (Get-AzResourceGroup -Name $rgGroupName -ErrorAction Stop) {
-    Write-Host "$($rgGrouName) exists. Skipping creation of group."
-}
-else {
+try {
+    Get-AzResourceGroup -Name $rgGroupName -ErrorAction Stop
+    Write-Host "$($rgGroupName) exists. Skipping creation of group."
+} catch {
     New-AzResourceGroup -Name $rgGroupName -Location "Southeast Asia" -Tag @{Projects = "DevOps" }
-    Write-Host "$($rgGrouName) group created."
+    Write-Host "$($rgGroupName) group created."
 }
 
 # Check if SA exists
-if (Get-AzStorageAccount -ResourceGroupName $rgGroupName -Name $storageAccountName -ErrorAction Stop) {
+try {
+    Get-AzStorageAccount -ResourceGroupName $rgGroupName -Name $storageAccountName -ErrorAction Stop 
     Write-Host "$($storageAccountName) exists. Skipping creation of Storage Account."
 }
-else {
+catch {
     New-AzStorageAccount -ResourceGroupName $rgGroupName `
         -Name $storageAccountName `
         -Location "Southeast Asia" `
         -SkuName Standard_LRS `
-        -Kind StorageV2
-    -Tag @{Projects = "DevOps" }
+        -Kind StorageV2 `
+        -Tag @{Projects = "DevOps" }
     Write-Host "$($storageAccountName) created."
 }
 
