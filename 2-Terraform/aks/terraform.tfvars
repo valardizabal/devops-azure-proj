@@ -1,5 +1,5 @@
 name     = "devopsproj"
-location = "southeastasia"
+location = "southeastasias"
 rgname   = "devops-proj-rg"
 
 kubernetes_version         = "1.31.1"
