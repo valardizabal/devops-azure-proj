@@ -13,7 +13,6 @@ on:
 
 jobs:
   terraform-fmt-check:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
     defaults:
       run:
         working-directory: "./2-Terraform/aks"
