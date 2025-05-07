@@ -161,12 +161,12 @@ resource "azurerm_role_assignment" "appgwcontainerfix2" {
 
 # Delegate Network Contributor permission for join to association subnet
 # az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --scope $ALB_SUBNET_ID --role "4d97b98b-1d4f-4787-a291-c67834d212e7" 
-# resource "azurerm_role_assignment" "appgwcontainerfix3" {
-#   principal_id         = azurerm_user_assigned_identity.alb_identity.principal_id
-#   scope                = data.azurerm_subnet.appgwsubnet.id
-#   role_definition_name = "Network Contributor"
-#   depends_on = [
-#     azurerm_kubernetes_cluster.k8s,
-#     azurerm_user_assigned_identity.alb_identity
-#   ]
-# }
+resource "azurerm_role_assignment" "appgwcontainerfix3" {
+  principal_id         = azurerm_user_assigned_identity.alb_identity.principal_id
+  scope                = data.azurerm_subnet.appgwsubnet.id
+  role_definition_name = "Network Contributor"
+  depends_on = [
+    azurerm_kubernetes_cluster.k8s,
+    azurerm_user_assigned_identity.alb_identity
+  ]
+}
