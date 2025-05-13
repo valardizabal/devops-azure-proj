@@ -1,0 +1,79 @@
+name: Docker Image to ACR - CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '3-Docker/app/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ACR_NAME: "devopsprojazurecr"
+      IMAGE_REPO: "devopsproj"
+      IMAGE_TAG: "v1"
+      PLATFORM_FLAG: "--platform=linux/amd64"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Verify ACR exists
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az acr show --name $ACR_NAME --query name -o tsv
+
+    - name: Login to ACR
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az acr login --name $ACR_NAME
+    
+    - name: Get latest image version and increment
+      id: versioning
+      run: |
+        REPO=$IMAGE_REPO
+        ACR=$ACR_NAME
+
+        # Fetch existing tags
+        tags=$(az acr repository show-tags --name $ACR --repository $REPO --output tsv | grep '^v' || echo "v0")
+
+        # Get max version number
+        latest_version=$(echo "$tags" | sed 's/v//' | sort -nr | head -n1)
+        next_version=$((latest_version + 1))
+        NEW_TAG="v$next_version"
+
+        echo "Next tag: $NEW_TAG"
+        echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+        echo "FULL_IMAGE_TAG=$ACR.azurecr.io/$REPO:$NEW_TAG" >> $GITHUB_ENV
+        echo "LATEST_TAG=$ACR.azurecr.io/$REPO:latest" >> $GITHUB_ENV
+
+    - name: Build Docker image
+      run: docker build $PLATFORM_FLAG -t $FULL_IMAGE_TAG .
+      working-directory: "./3-Docker/"
+      env:
+        FULL_IMAGE_TAG: ${{ env.FULL_IMAGE_TAG }}
+        PLATFORM_FLAG: ${{ env.PLATFORM_FLAG }}
+    
+    - name: Tag image as latest
+      run: docker tag $FULL_IMAGE_TAG $LATEST_TAG
+      env:
+        FULL_IMAGE_TAG: ${{ env.FULL_IMAGE_TAG }}
+        LATEST_TAG: ${{ env.LATEST_TAG }}
+
+    - name: Push image with version tag
+      run: docker push $FULL_IMAGE_TAG
+
+    - name: Push image with latest tag
+      run: docker push $LATEST_TAG
+
+    - name: Logout of Azure
+      if: always()
+      run: az logout
