@@ -2,7 +2,7 @@ name: Docker Image to ACR - CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main2" ]
     paths:
       - '3-Docker/app/**'
 
