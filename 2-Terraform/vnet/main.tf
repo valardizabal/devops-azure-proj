@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.9.6"
   backend "azurerm" {
-    resource_group_name  = "devops-proj-rg"
+    resource_group_name  = "rg-devops-proj"
     storage_account_name = "devopsprojst"
     container_name       = "tfstate"
     key                  = "vnet-terraform.tfstate"
@@ -13,12 +13,12 @@ terraform {
       version = ">= 4.3.0"
     }
   }
+
 }
 
 provider "azurerm" {
   features {}
-  subscription_id = "8c6f346b-200d-4475-99b4-d26874174cbd"
-
+  subscription_id = var.subscription_id
 }
 
 data "azurerm_resource_group" "resource_group" {
@@ -33,7 +33,6 @@ resource "azurerm_virtual_network" "virtual_network" {
   address_space       = [var.network_address_space]
 
   tags = var.tags
-
 }
 
 resource "azurerm_subnet" "aks_subnet" {
@@ -55,7 +54,6 @@ resource "azurerm_subnet" "app_gwsubnet" {
     service_delegation {
       name    = "Microsoft.ServiceNetworking/trafficControllers"
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
-
     }
   }
 }

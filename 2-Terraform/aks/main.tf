@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.9.6"
   backend "azurerm" {
-    resource_group_name  = "devops-proj-rg"
+    resource_group_name  = "rg-devops-proj"
     storage_account_name = "devopsprojst"
     container_name       = "tfstate"
     key                  = "aks-terraform.tfstate"
@@ -17,7 +17,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "8c6f346b-200d-4475-99b4-d26874174cbd"
+  subscription_id = var.subscription_id
 
 }
 
@@ -126,7 +126,7 @@ resource "azurerm_federated_identity_credential" "alb_federated_identity" {
   ]
 }
 
-# RBAC
+# RBAC - assigned to the AKS node pool (kubelet process)
 resource "azurerm_role_assignment" "node_infrastructure_update_scale_set" {
   principal_id         = azurerm_kubernetes_cluster.k8s.kubelet_identity[0].object_id
   scope                = data.azurerm_resource_group.node_resource_group.id

@@ -7,7 +7,7 @@ Import-Module Az
 
 $tenantId = "e1858381-60c4-4a56-9e29-7d9efe1ddc47"
 $subscriptionId = "8c6f346b-200d-4475-99b4-d26874174cbd"
-$rgGroupName = "devops-proj-rg"
+$rgGroupName = "rg-devops-proj"
 $storageAccountName = "devopsprojst"
 $containerName = "tfstate"
 

@@ -1,6 +1,7 @@
-name     = "devopsproj"
-location = "southeastasia"
-rgname   = "devops-proj-rg"
+name            = "devopsproj"
+location        = "southeastasia"
+rgname          = "rg-devops-proj"
+subscription_id = "8c6f346b-200d-4475-99b4-d26874174cbd"
 
 kubernetes_version         = "1.31.1"
 agent_count                = 3

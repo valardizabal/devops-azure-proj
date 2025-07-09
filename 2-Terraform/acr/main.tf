@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.9.6"
   backend "azurerm" {
-    resource_group_name  = "devops-proj-rg"
+    resource_group_name  = "rg-devops-proj"
     storage_account_name = "devopsprojst"
     container_name       = "tfstate"
     key                  = "acr-terraform.tfstate"
@@ -15,19 +15,25 @@ terraform {
   }
 }
 
+# Configure the Azure Provider
 provider "azurerm" {
   features {}
-  subscription_id = "8c6f346b-200d-4475-99b4-d26874174cbd"
-
+  subscription_id = var.subscription_id
 }
 
+# Create a Resource Group
+resource "azurerm_resource_group" "acr_rg" {
+  name     = var.rgname
+  location = var.location
+  tags     = var.tags
+}
+
+# Create an Azure Container Registry
 resource "azurerm_container_registry" "acr" {
   name                = "${var.name}azurecr"
-  resource_group_name = var.rgname
-  location            = var.location
+  resource_group_name = azurerm_resource_group.acr_rg.name
+  location            = azurerm_resource_group.acr_rg.location
   sku                 = "Standard"
   admin_enabled       = false
-
-  tags = var.tags
-
+  tags                = var.tags
 }

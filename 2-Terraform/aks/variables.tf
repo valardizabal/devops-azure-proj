@@ -6,7 +6,7 @@ variable "name" {
 
 variable "rgname" {
   type        = string
-  default     = "devops-proj-rg"
+  default     = "rg-devops-proj"
   description = "Name for rg"
 }
 
@@ -14,6 +14,11 @@ variable "location" {
   type        = string
   default     = "southeastasia"
   description = "Azure Location of resources"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription ID"
 }
 
 variable "kubernetes_cluster_rbac_enabled" {

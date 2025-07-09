@@ -4,9 +4,15 @@ variable "name" {
   description = "Name for resources"
 }
 
+variable "subscription_id" {
+  type        = string
+  default     = "8c6f346b-200d-4475-99b4-d26874174cbd"
+  description = "Azure Subscription ID"
+}
+
 variable "rgname" {
   type        = string
-  default     = "devops-proj-rg"
+  default     = "rg-devops-proj"
   description = "Name for rg"
 }
 

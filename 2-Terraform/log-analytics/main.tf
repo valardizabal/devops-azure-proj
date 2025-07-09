@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.9.6"
   backend "azurerm" {
-    resource_group_name  = "devops-proj-rg"
+    resource_group_name  = "rg-devops-proj"
     storage_account_name = "devopsprojst"
     container_name       = "tfstate"
     key                  = "la-terraform.tfstate"
@@ -17,7 +17,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "8c6f346b-200d-4475-99b4-d26874174cbd"
+  subscription_id = var.subscription_id
 
 }
 
