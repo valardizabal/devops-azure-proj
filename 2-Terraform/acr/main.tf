@@ -22,7 +22,7 @@ provider "azurerm" {
 }
 
 # Create a Resource Group
-resource "azurerm_resource_group" "acr_rg" {
+resource "azurerm_resource_group" "rg" {
   name     = var.rgname
   location = var.location
   tags     = var.tags
@@ -31,8 +31,8 @@ resource "azurerm_resource_group" "acr_rg" {
 # Create an Azure Container Registry
 resource "azurerm_container_registry" "acr" {
   name                = "${var.name}azurecr"
-  resource_group_name = azurerm_resource_group.acr_rg.name
-  location            = azurerm_resource_group.acr_rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
   sku                 = "Standard"
   admin_enabled       = false
   tags                = var.tags

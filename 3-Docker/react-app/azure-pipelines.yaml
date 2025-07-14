@@ -1,0 +1,64 @@
+trigger:
+- main
+
+# Self-hosted agent pool using AVD
+pool:
+  vmImage: 'my-pool'
+
+variables:
+  acrName: 'devopsazurecr.azurecr.io'
+  dockerfilePath: 'Dockerfile'
+  imageName: 'react-vite-app'
+  serviceConnection: 'acr-serviceconnection'
+
+stages:
+- stage: React_App_Build
+  displayName: 'Build React App'
+  jobs:
+  - job: BuildReact
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+      displayName: 'Install Dependencies'
+    
+    # - script: |
+    #   npm run test
+    #  displayName: 'Run Tests'
+    
+    - script: |
+        npm run build
+      displayName: 'Build React App'
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifact: 'react-app-build'
+        targetPath: 'dist'
+        publishLocation: 'pipeline'
+      displayName: 'Publish Build Artifacts'
+
+- stage: Docker_Image_Build
+  displayName: 'Build Docker Image'
+  dependsOn: React_App_Build
+  jobs:
+  - job: BuildDockerImage
+    steps:
+      - download: current
+        artifact: react-app-build
+        displayName: 'Download Build Artifacts'
+      
+      - task: Docker@2
+        inputs:
+            repository: $(imageName)
+            containerRegistry: $(service-connection)
+            command: 'buildAndPush'
+            Dockerfile: $(dockerfilePath)
+            buildContext: '$(Pipeline.Workspace)/react-app-build'
+            tags: $(Build.BuildId)
+        displayName: 'Build and Push Docker Image'
+    
+      
