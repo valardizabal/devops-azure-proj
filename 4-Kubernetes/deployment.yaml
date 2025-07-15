@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ads-verifiedids-react-cloud
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ads-verifiedids-react
+  namespace: ads-verifiedids-react-cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ads-verifiedids-react-cloud
+  template:
+    metadata:
+      labels:
+        app: ads-verifiedids-react-cloud
+    spec:
+      containers:
+      - name: ads-verifiedids-react
+        image: devopsprojazurecr.azurecr.io/react-vite-app:22
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ads-verifiedids-react
+  namespace: ads-verifiedids-react-cloud
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: ads-verifiedids-react-cloud
